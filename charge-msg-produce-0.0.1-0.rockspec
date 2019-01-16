@@ -1,8 +1,7 @@
 package = "charge-msg-produce"
 version = "0.0.1-0"
 source = {
-   url = "git://github.com/tfnick/charge-msg-produce",
-   tag = "0.0.1"
+   url = "git://github.com/tfnick/charge-msg-produce.git"
 }
 description = {
    summary = "This plugin sends request and response logs to Kafka.",
