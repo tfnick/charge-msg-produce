@@ -1,108 +1,136 @@
 
-### 插件顺序
+# Kong Kafka Log Plugin
 
-jwt-header-rewrite -> jwt | sign-verify -> quota-check -> charge-msg-produce
+This plugin publishes request and response logs to a [Kafka](https://kafka.apache.org/) topic.
 
-### 插件级别
+## Status
+Experimental
 
-jwt-header-rewrite(global) -> jwt | sign-verify(route) -> quota-check(route) -> charge-msg-produce(route)
+## Supported Kong Releases
+Kong >= 0.14.x 
 
-
-### quota-check主要功能
-
-基于全局共享缓存ngx-sharr-DICT实现，当计费系统发现账户余额不足，调用网关的admin-api更新数据库以及全局缓存，实现客户quota不足的访问控制
-
-
-### jwt-header-rewrite主要功能
-
-将吉荣数网关的定制jwtToken转换为kong中的Bearer类型表示比如
-
+## Installation
+Recommended:
 ```
-Content-TOKEN:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkOTg0ZDg5MDMzZmE0MDE0OTQ2YThhYTE4MjA5NDc1YiIsImV4cCI6MTU0ODE3NTU2Nn0.mRPVYmGS0l9ZCA-i28PA9JCi_vkKRqzpr6vno-Sd69U
-
+$ luarocks install kong-plugin-kafka-log
 ```
-表示为：
-
+Other:
 ```
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkOTg0ZDg5MDMzZmE0MDE0OTQ2YThhYTE4MjA5NDc1YiIsImV4cCI6MTU0ODE3NTU2Nn0.mRPVYmGS0l9ZCA-i28PA9JCi_vkKRqzpr6vno-Sd69U
-
-```
-即：Authorization: Bearer <token> 的表示形式
-
-
-### sign签名验证
-
-实现老接口的sign签名方法，兼容老接口
-
-### charge-msg-produce
-
-基于kafka 发送计费消息，实现网关统一的计费.
-
-
-
-### 插件安装过程
-
-git clone https://github.com/tfnick/jwt-header-rewrite.git
-
-cd jwt-header-rewrite
-
-luarocks install jwt-header-rewrite-1.0-0.rockspec
-
-> setup location check after install
-
+$ git clone https://github.com/yskopets/kong-plugin-kafka-log.git /path/to/kong/plugins/kong-plugin-kafka-log
+$ cd /path/to/kong/plugins/kong-plugin-kafka-log
+$ luarocks make *.rockspec
 ```
 
-/usr/local/share/lua/5.1/kong/plugins/jwt-header-rewrite
+## Configuration
 
+### Enabling globally
+
+```bash
+$ curl -X POST http://kong:8001/plugins \
+    --data "name=kafka-log" \
+    --data "config.bootstrap_servers=localhost:9092" \
+    --data "config.topic=kong-log" \
+    --data "config.timeout=10000" \
+    --data "config.keepalive=60000" \
+    --data "config.producer_request_acks=1" \
+    --data "config.producer_request_timeout=2000" \
+    --data "config.producer_request_limits_messages_per_request=200" \
+    --data "config.producer_request_limits_bytes_per_request=1048576" \
+    --data "config.producer_request_retries_max_attempts=10" \
+    --data "config.producer_request_retries_backoff_timeout=100" \
+    --data "config.producer_async=true" \
+    --data "config.producer_async_flush_timeout=1000" \
+    --data "config.producer_async_buffering_limits_messages_in_memory=50000"
 ```
 
-> 重启kong
+### Parameters
 
-kong restart / reload
+Here's a list of all the parameters which can be used in this plugin's configuration:
 
-> 通过Kong Admin Api检查插件是否已经启用
+| Form Parameter | default | description |
+| --- 						| --- | --- |
+| `name` 					                        |       | The name of the plugin to use, in this case `kafka-log` |
+| `config.bootstrap_servers` 	                    |       | List of bootstrap brokers in `host:port` format |
+| `config.topic` 			                        |       | Topic to publish to |
+| `config.timeout`   <br /> <small>Optional</small> | 10000 | Socket timeout in millis |
+| `config.keepalive` <br /> <small>Optional</small> | 60000 | Keepalive timeout in millis |
+| `config.producer_request_acks` <br /> <small>Optional</small>                              | 1       | The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments, 1 for only the leader and -1 for the full ISR |
+| `config.producer_request_timeout` <br /> <small>Optional</small>                           | 2000    | Time to wait for a Produce response in millis |
+| `config.producer_request_limits_messages_per_request` <br /> <small>Optional</small>       | 200     | Maximum number of messages to include into a single Produce request |
+| `config.producer_request_limits_bytes_per_request` <br /> <small>Optional</small> 	     | 1048576 | Maximum size of a Produce request in bytes |
+| `config.producer_request_retries_max_attempts` <br /> <small>Optional</small> 	         | 10      | Maximum number of retry attempts per single Produce request |
+| `config.producer_request_retries_backoff_timeout` <br /> <small>Optional</small>	     	 | 100     | Backoff interval between retry attempts in millis |
+| `config.producer_async` <br /> <small>Optional</small>                                     | true    | Flag to enable asynchronous mode |
+| `config.producer_async_flush_timeout` <br /> <small>Optional</small>                       | 1000    | Maximum time interval in millis between buffer flushes in in asynchronous mode | 
+| `config.producer_async_buffering_limits_messages_in_memory` <br /> <small>Optional</small> | 50000   | Maximum number of messages that can be buffered in memory in asynchronous mode |
 
-curl 127.0.0.1:8001/plugins/enabled 2>/dev/null |python -m json.tool
+## Log Format
 
+Similar to [HTTP Log Plugin](https://docs.konghq.com/hub/kong-inc/http-log#log-format).
 
-> 测试插件是否起作用
+## Implementation details
 
-```
-curl -H "Content-TOKEN:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkMlN6emVoWWM1ODdxM1ZlWjVlU2FaTFdwSXhOaUFUbSIsImV4cCI6MTU0NzAyNzg4M30.hEZweYlX8nG4Vm5AFWBg-Bqg-G3rp33VjgsqCDLFsQs" 192.168.1.195:8000/jwt
+This plugin makes use of [lua-resty-kafka](https://github.com/doujiang24/lua-resty-kafka) client under the hood.   
 
-```
+## Known issues and limitations
 
-> kong日志目录
+Known limitations: 
 
-```
+1. There is no support for TLS
+2. There is no support for Authentication
+3. There is no support for message compression
 
-/usr/local/kong/logs
+## Quickstart
 
-```
+The following guidelines assume that both `Kong` and `Kafka` have been installed on your local machine: 
 
-> kong jwt plugin return
+1. Install `kong-plugin-kafka-log` via `luarocks`:
 
-```
-{"exp":"token expired"}
-```
+    ```
+    luarocks install kong-plugin-kafka-log
+    ```
 
-服务端需要设置一个更长的token有效期
-```
-{"exp":"exceeds maximum allowed expiration"}
+2. Load the `kong-plugin-kafka-log` in `Kong`:
 
-```
+    ```
+    KONG_PLUGINS=bundled,kafka-log bin/kong start
+    ```
 
-header 传递
+3. Create `kong-log` topic in your `Kafka` cluster:
 
-```
+    ```
+    ${KAFKA_HOME}/bin/kafka-topics.sh --create \
+        --zookeeper localhost:2181 \
+        --replication-factor 1 \
+        --partitions 10 \
+        --topic kong-log
+    ```
 
-Upstream Headers
-When a JWT is valid, a Consumer has been authenticated, the plugin will append some headers to the request before proxying it to the upstream service, so that you can identify the Consumer in your code:
+4. Add `kong-plugin-kafka-log` plugin globally:
 
-X-Consumer-ID, the ID of the Consumer on Kong
-X-Consumer-Custom-ID, the custom_id of the Consumer (if set)
-X-Consumer-Username, the username of the Consumer (if set)
-X-Anonymous-Consumer, will be set to true when authentication failed, and the ‘anonymous’ consumer was set instead.
+    ```
+    curl -X POST http://localhost:8001/plugins \
+        --data "name=kafka-log" \
+        --data "config.bootstrap_servers=localhost:9092" \
+        --data "config.topic=kong-log"
+    ```
+    
+5. Make sample requests:
 
-```
+    ```
+    for i in {1..50} ; do curl http://localhost:8000/request/$i ; done
+    ```
 
+6. Verify the contents of `Kafka` topic:
+
+    ```
+    ${KAFKA_HOME}/bin/kafka-console-consumer.sh \
+        --bootstrap-server localhost:9092 \
+        --topic kong-log \
+        --partition 0 \
+        --from-beginning \
+        --timeout-ms 1000
+    ```
+
+## Maintainers
+[yskopets](https://github.com/yskopets)  
