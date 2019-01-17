@@ -27,7 +27,8 @@ local function create_producer(conf)
 
     max_retry = conf.producer_request_retries_max_attempts,
     retry_backoff = conf.producer_request_retries_backoff_timeout,
-
+    
+    -- default must be async
     producer_type = conf.producer_async and "async" or "sync",
     flush_time = conf.producer_async_flush_timeout,
     max_buffering = conf.producer_async_buffering_limits_messages_in_memory,
