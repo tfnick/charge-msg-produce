@@ -3,7 +3,7 @@ local basic_serializer = require "kong.plugins.log-serializers.basic"
 local producers = require "kong.plugins.charge-msg-produce.producers"
 local cjson = require "cjson"
 local cjson_encode = cjson.encode
-local uuid = require 'resty.uuid'
+local uuid = require 'resty.jit-uuid'
 
 local ChargeMsgHandler = BasePlugin:extend()
 
@@ -69,7 +69,7 @@ function ChargeMsgHandler:log(conf, other)
   local msg = {}
 
   msg["cid"] = request.get_headers()["X-Consumer-Custom-ID"]
-  msg["uuid"] = uuid.generate()
+  msg["uuid"] = uuid.generate_v3()
   msg["path"] = ngx.ctx.service --ngx.var.request_uri or ""
   msg["reqt"] = ngx.var.request_time * 1000
   msg["rest"] = ngx.req.start_time() * 1000
