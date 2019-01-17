@@ -69,7 +69,7 @@ function ChargeMsgHandler:log(conf, other)
   local msg = {}
 
   msg["cid"] = request.get_headers()["X-Consumer-Custom-ID"]
-  msg["uuid"] = uuid.generate_v3()
+  msg["uuid"] = request.get_headers()["Kong-Request-ID"] or uuid.uuid()
   msg["path"] = ngx.ctx.service --ngx.var.request_uri or ""
   msg["reqt"] = ngx.var.request_time * 1000
   msg["rest"] = ngx.req.start_time() * 1000
