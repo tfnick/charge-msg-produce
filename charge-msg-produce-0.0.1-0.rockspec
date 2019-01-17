@@ -5,7 +5,6 @@ source = {
 }
 description = {
    summary = "This plugin sends request and response logs to Kafka.",
-   homepage = "https://github.com/yskopets/charge-msg-produce",
    license = "Apache 2.0"
 }
 dependencies = {
@@ -17,7 +16,6 @@ build = {
    modules = {
       ["kong.plugins.charge-msg-produce.handler"] = "kong/plugins/charge-msg-produce/handler.lua",
       ["kong.plugins.charge-msg-produce.schema"] = "kong/plugins/charge-msg-produce/schema.lua",
-
       ["kong.plugins.charge-msg-produce.types"] = "kong/plugins/charge-msg-produce/types.lua",
       ["kong.plugins.charge-msg-produce.producers"] = "kong/plugins/charge-msg-produce/producers.lua",
    }

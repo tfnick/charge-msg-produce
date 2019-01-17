@@ -24,6 +24,7 @@ end
 
 return {
   fields = {
+    open_debug = {type = "number", default = 0}, -- 0 close 1 open
     bootstrap_servers = { type = "array", required = true, func = check_bootstrap_servers },
     topic = { type = "string", required = true },
     timeout = { type = "number", default = 10000 },
@@ -37,6 +38,9 @@ return {
     producer_async = { type = "boolean", default = true },
     producer_async_flush_timeout = { type = "number", default = 1000 },
     producer_async_buffering_limits_messages_in_memory = { type = "number", default = 50000 },
+    black_list = {type = "array"},
+    -- define multi version service url to one product code if need
+    path_prodcode_map = {type = "table"},
   },
   self_check = regenerate_uuid,
 }
