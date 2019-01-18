@@ -33,7 +33,7 @@ local function check_path_prodcode_mappings(value)
   	return true
   else
   	-- check the string match  |path1:code|path2:code| ?
-  	  local ok = types.path_prodcode(value)
+  	  local ok = types.valid_path_prod(value)
       if not ok then
         return false, "invalid path_prodcode_mappings value: " .. value
       else
