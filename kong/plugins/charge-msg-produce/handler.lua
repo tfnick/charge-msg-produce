@@ -71,7 +71,7 @@ end
 
 function ChargeMsgHandler:log(conf, other)
   ChargeMsgHandler.super.log(self)
-
+  ngx.log(ngx.NOTICE, " entry ", " charge plugins ")
   local request = ngx.req
 
   local msg = {}
@@ -84,10 +84,10 @@ function ChargeMsgHandler:log(conf, other)
   end
 
   -- no charge 1
-  local fee = request.get_headers()["X-Custom-Fee"]
-  if not fee or fee == false then
-  	return
-  end
+  -- local fee = request.get_headers()["X-Custom-Fee"]
+  -- if not fee or fee == false then
+  --	return
+  -- end
 
   -- no charge 2
   local uri = ngx.ctx.service
