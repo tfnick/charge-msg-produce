@@ -90,7 +90,7 @@ function ChargeMsgHandler:log(conf, other)
   -- end
 
   -- no charge 2
-  local uri = ngx.var.request_uri or "" -- ngx.ctx.service
+  local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
 
   if conf.black_paths then
     for _, rule in ipairs(conf.black_paths) do
