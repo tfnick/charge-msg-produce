@@ -15,6 +15,33 @@ local function check_bootstrap_servers(values)
   return false, "bootstrap_servers is required"
 end
 
+local function check_black_paths(values)
+  if values and 0 < #values then
+    for _, value in ipairs(values) do
+      if not value or value == nil then
+        return false, "invalid black_paths : " .. value
+      end
+    end
+    return true
+  end
+  return true
+end
+
+
+local function check_path_prodcode_mappings(value)
+  if not value or value == nile then
+  	return true
+  else
+  	-- check the string match  |path1:code|path2:code| ?
+  	  local ok = types.path_prodcode(value)
+      if not ok then
+        return false, "invalid path_prodcode_mappings value: " .. value
+      else
+      	return true
+      end
+  end
+end
+
 --- (Re)assigns a unique id on every configuration update.
 -- since `uuid` is not a part of the `fields`, clients won't be able to change it
 local function regenerate_uuid(schema, plugin_t, dao, is_updating)
@@ -38,9 +65,9 @@ return {
     producer_async = { type = "boolean", default = true },
     producer_async_flush_timeout = { type = "number", default = 1000 },
     producer_async_buffering_limits_messages_in_memory = { type = "number", default = 50000 },
-    black_paths = {type = "array"},
+    black_paths = {type = "array", func = check_black_paths},
     -- define multi version service url to one product code if need
-    path_prodcode_mappings = {type = "table"},
+    path_prodcode_mappings = {type = "string", func = check_path_prodcode_mappings},
   },
   self_check = regenerate_uuid,
 }
