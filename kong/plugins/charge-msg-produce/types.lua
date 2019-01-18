@@ -30,7 +30,9 @@ function _M.single_path_prod_table(string)
   if not m then
     return nil, "invalid path_prod_mappings value: " .. string
   end
-  return { m[1] = m[2] }
+  local t = {}
+  t[m[1]] = m[2]
+  return t
 end
 
 return _M
