@@ -85,7 +85,7 @@ function ChargeMsgHandler:log(conf, other)
 
   -- no charge 1
   local fee = request.get_headers()["X-Custom-Fee"]
-  if not fee or fee == false
+  if not fee or fee == false then
   	return
   end
 
