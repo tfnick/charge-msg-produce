@@ -127,8 +127,8 @@ function ChargeMsgHandler:log(conf, other)
 
   msg["uuid"] = request.get_headers()["Kong-Request-ID"] or utils.uuid()
   msg["path"] = uri --ngx.var.request_uri or ""
-  msg["reqt"] = ngx.var.request_time * 1000
-  msg["rest"] = ngx.req.start_time() * 1000
+  msg["reqt"] = ngx.req.start_time() * 1000
+  msg["rest"] = msg["reqt"] + ngx.var.request_time * 1000
 
   local message = cjson_encode(msg)
 
