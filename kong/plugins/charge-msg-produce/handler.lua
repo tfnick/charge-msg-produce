@@ -16,7 +16,7 @@ local producers_cache = setmetatable({}, { __mode = "k" })
 -- we use a weak table, index by the `conf` parameter, so once the plugin config
 -- is GC'ed, the cache follows automatically
 -- conf -> table
-local path_prod_caches = setmetatable({}, { __mode = "k" })
+local path_prod_cache = setmetatable({}, { __mode = "k" })
 
 
 --- Computes a cache key for a given configuration.
@@ -24,7 +24,7 @@ local function cache_key(conf)
   -- here we rely on validation logic in schema that automatically assigns a unique id
   -- on every configuartion update
   if conf.open_debug == 1 then
-    ngx.log(ngx.ERR, " cache_key ", conf.uuid)
+    ngx.log(ngx.ERR, " cache_key is ", conf.uuid)
   end
   return conf.uuid
 end
@@ -95,34 +95,36 @@ function ChargeMsgHandler:log(conf, other)
   if conf.black_paths then
     for _, rule in ipairs(conf.black_paths) do
        if rule == uri then
-       	 ngx.log(ngx.NOTICE, " hit black path list ","skip send charge message")
+       	 ngx.log(ngx.NOTICE, uri.." hit black path ","skip send charge message")
        	 return
        end
     end
   end
 
-
+  
   -- get path_prod table from cache
-  local path_prod_table = path_prod_caches[cache_key]
+  if conf.path_prod_mappings ~= nil then
+    local path_prod_table = path_prod_cache[cache_key]
 
-  if not path_prod_table  and  conf.path_prod_mappings ~= nil then
-    kong.log.notice("creating a new path_prod_table for cache key: ", cache_key)
+    if not path_prod_table  then
+      kong.log.notice("creating a new path_prod_table for cache key: ", cache_key)
 
-    path_prod_mappings,err = paths.new(conf)
+      path_prod_mappings,err = paths.new(conf)
 
-    if not path_prod_mappings then
-      ngx.log(ngx.ERR, "[charge-log] failed to create a path_prod_table for a given configuration: ", err)
-      return
+      if not path_prod_mappings then
+        ngx.log(ngx.ERR, "[charge-log] failed to create a path_prod_table for a given configuration: ", err)
+      end
+
+      path_prod_cache[cache_key] = path_prod_mappings
     end
 
-    path_prod_caches[cache_key] = path_prod_mappings
-  end
-
- 
-  if path_prod_table and path_prod_table[uri] ~= nil then 
-  	ngx.log(ngx.NOTICE, " mapping charge path "..uri," to "..path_prod_table[uri])
-  	uri = path_prod_table[uri]
-  end
+    if path_prod_table and path_prod_table[uri] ~= nil then 
+      if conf.open_debug == 1 then
+        ngx.log(ngx.NOTICE, " mapping charge path "..uri," to "..path_prod_table[uri])
+      end
+      uri = path_prod_table[uri]
+    end
+  end 
   
 
   msg["uuid"] = request.get_headers()["Kong-Request-ID"] or utils.uuid()

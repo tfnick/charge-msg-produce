@@ -15,15 +15,6 @@ function _M.bootstrap_server(string)
   return { host = m[1], port = m[2] }
 end
 
--- check the string match  |path1:code|path2:code| 
-function _M.valid_path_prod(string)
-  local m = re_match(string, path_prod_mappings_regex, "jo")
-  if not m then
-    return false, "invalid path_prod_mappings value: " .. string
-  end
-  return true
-end
-
 --- Parses `path:code` string into a `{path:code}` table.
 function _M.single_path_prod_table(string)
   local m = re_match(string, path_prod_mappings_regex, "jo")
