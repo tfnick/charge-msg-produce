@@ -28,18 +28,17 @@ local function check_black_paths(values)
 end
 
 
-local function check_path_prodcode_mappings(value)
-  if not value or value == nile then
-  	return true
-  else
-  	-- check the string match  |path1:code|path2:code| ?
-  	  local ok = types.valid_path_prod(value)
-      if not ok then
+local function check_path_prodcode_mappings(values)
+  if values and 0 < #values then
+    for _, value in ipairs(values) do
+      local single_path_prod = types.single_path_prod_table(value)
+      if not single_path_prod then
         return false, "invalid path_prodcode_mappings value: " .. value
-      else
-      	return true
       end
+    end
+    return true
   end
+  return true
 end
 
 --- (Re)assigns a unique id on every configuration update.
@@ -67,7 +66,7 @@ return {
     producer_async_buffering_limits_messages_in_memory = { type = "number", default = 50000 },
     black_paths = {type = "array", func = check_black_paths},
     -- define multi version service url to one product code if need
-    path_prodcode_mappings = {type = "string", func = check_path_prodcode_mappings},
+    path_prodcode_mappings = {type = "array", func = check_path_prodcode_mappings},
   },
   self_check = regenerate_uuid,
 }
