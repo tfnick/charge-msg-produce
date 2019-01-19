@@ -109,13 +109,13 @@ function ChargeMsgHandler:log(conf, other)
     if not path_prod_table  then
       kong.log.notice("creating a new path_prod_table for cache key: ", cache_key)
 
-      path_prod_mappings,err = paths.new(conf)
+      path_prod_table,err = paths.new(conf)
 
-      if not path_prod_mappings then
+      if not path_prod_table then
         ngx.log(ngx.ERR, "[charge-log] failed to create a path_prod_table for a given configuration: ", err)
+      else
+        path_prod_cache[cache_key] = path_prod_table
       end
-
-      path_prod_cache[cache_key] = path_prod_mappings
     end
 
     if path_prod_table and path_prod_table[uri] ~= nil then 
