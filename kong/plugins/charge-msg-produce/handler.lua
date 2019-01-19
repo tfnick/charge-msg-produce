@@ -23,9 +23,6 @@ local path_prod_cache = setmetatable({}, { __mode = "k" })
 local function cache_key(conf)
   -- here we rely on validation logic in schema that automatically assigns a unique id
   -- on every configuartion update
-  if conf.open_debug == 1 then
-    ngx.log(ngx.ERR, " cache_key is ", conf.uuid)
-  end
   return conf.uuid
 end
 
@@ -84,10 +81,10 @@ function ChargeMsgHandler:log(conf, other)
   end
 
   -- no charge 1
-  -- local fee = request.get_headers()["X-Custom-Fee"]
-  -- if not fee or fee == false then
-  --	return
-  -- end
+  local fee = request.get_headers()["X-Custom-Fee"]
+  if not fee or fee == false then
+  	return
+  end
 
   -- no charge 2
   local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
@@ -95,7 +92,7 @@ function ChargeMsgHandler:log(conf, other)
   if conf.black_paths then
     for _, rule in ipairs(conf.black_paths) do
        if rule == uri then
-       	 ngx.log(ngx.NOTICE, uri.." hit black path ","skip send charge message")
+       	 -- ngx.log(ngx.NOTICE, uri.." hit black path ","skip send charge message")
        	 return
        end
     end
@@ -119,18 +116,7 @@ function ChargeMsgHandler:log(conf, other)
       end
     end
 
-    for k,v in ipairs(path_prod_table) do
-      ngx.log(ngx.NOTICE, "key is "..k," value is "..v)
-    end
-
-    ngx.log(ngx.NOTICE, " old uri is ", uri)
-    ngx.log(ngx.NOTICE, " test uri1 is ", path_prod_table["/a/284736964_120052353"])
-    ngx.log(ngx.NOTICE, " test uri2 is ", path_prod_table["\\/a\\/284736964_120052353"])
-    ngx.log(ngx.NOTICE, " test uri3 is ", path_prod_table[uri])
     if path_prod_table and path_prod_table[uri] ~= nil then 
-
-
-
       if conf.open_debug == 1 then
         ngx.log(ngx.NOTICE, " mapping charge path "..uri," to "..path_prod_table[uri])
       end
