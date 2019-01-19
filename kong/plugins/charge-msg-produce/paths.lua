@@ -8,16 +8,13 @@ local function create_path_code_table(conf)
     local single_path_code = types.single_path_prod_table(value)
     if not single_path_code then
       return nil, "invalid single_path_prod_table value: " .. value
-
     else
-
       for k, v in ipairs(single_path_code)  do
         all_path_codes[k] = v
       end
-
     end
-    return all_path_codes
   end
+  return all_path_codes
 end
 
 return { new = create_path_code_table }
