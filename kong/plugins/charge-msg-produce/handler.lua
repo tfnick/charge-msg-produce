@@ -119,7 +119,7 @@ function ChargeMsgHandler:log(conf, other)
     end
 
     if path_prod_table then
-      for k,v ipairs(path_prod_table) do
+      for k,v in ipairs(path_prod_table) do
         ngx.log(ngx.NOTICE, "key is "..k," value is "..v)
       end
 
