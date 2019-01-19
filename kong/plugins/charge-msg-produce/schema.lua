@@ -65,8 +65,10 @@ return {
     producer_async_flush_timeout = { type = "number", default = 1000 },
     producer_async_buffering_limits_messages_in_memory = { type = "number", default = 50000 },
     black_paths = {type = "array", func = check_black_paths},
-    -- define multi version service url to one product code if need
+    -- define multi version service url to one product code if need，format like /a.html:/a.html,/b.html:/a.html
     path_prodcode_mappings = {type = "array", func = check_path_prodcode_mappings},
+    -- will be replace when update plugin
+    uuid = {type = "string", default = "f41a4ed0-edb1-4a98-bd53-16fd7a8c6057"},
   },
   self_check = regenerate_uuid,
 }
