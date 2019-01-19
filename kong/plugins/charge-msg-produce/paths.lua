@@ -7,11 +7,9 @@ local function create_path_code_table(conf)
   for idx, value in ipairs(conf.path_prodcode_mappings) do
     ngx.log(ngx.NOTICE," singl key is ", idx)
     ngx.log(ngx.NOTICE," singl value is ", value)
-    local single_path_code = types.single_path_prod_table(value)
-    if not single_path_code then
-      for k, v in ipairs(single_path_code)  do
-        all_path_codes[k] = v
-      end
+    local k,v = types.single_path_prod_kv(value)
+    if k ~= nil then
+      all_path_codes[k] = v
     end
   end
   return all_path_codes

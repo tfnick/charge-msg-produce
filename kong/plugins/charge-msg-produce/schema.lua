@@ -31,8 +31,8 @@ end
 local function check_path_prodcode_mappings(values)
   if values and 0 < #values then
     for _, value in ipairs(values) do
-      local single_path_prod = types.single_path_prod_table(value)
-      if not single_path_prod then
+      local k,v = types.single_path_prod_kv(value)
+      if k == nil then
         return false, "invalid path_prodcode_mappings value: " .. value
       end
     end
