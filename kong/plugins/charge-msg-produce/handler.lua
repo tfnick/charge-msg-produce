@@ -103,7 +103,7 @@ function ChargeMsgHandler:log(conf, other)
 
   
   -- get path_prod table from cache
-  if conf.path_prod_mappings ~= nil then
+  if conf.path_prodcode_mappings ~= nil then
     local path_prod_table = path_prod_cache[cache_key]
 
     if not path_prod_table  then
