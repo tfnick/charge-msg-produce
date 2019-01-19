@@ -5,7 +5,7 @@ local cjson = require "cjson"
 local cjson_encode = cjson.encode
 local utils = require "kong.tools.utils"
 local paths = require "kong.plugins.charge-msg-produce.paths"
-
+local ipairs = ipairs
 local ChargeMsgHandler = BasePlugin:extend()
 
 ChargeMsgHandler.PRIORITY = 5
@@ -118,7 +118,20 @@ function ChargeMsgHandler:log(conf, other)
       end
     end
 
+    if path_prod_table then
+      for k,v ipairs(path_prod_table) do
+        ngx.log(ngx.NOTICE, "key is "..k," value is "..v)
+      end
+
+    end
+    ngx.log(ngx.NOTICE, " old uri is ", uri)
+    ngx.log(ngx.NOTICE, " test uri1 is ", path_prod_table["/a/284736964_120052353"])
+    ngx.log(ngx.NOTICE, " test uri2 is ", path_prod_table["\\/a\\/284736964_120052353"])
+    ngx.log(ngx.NOTICE, " test uri3 is ", path_prod_table[uri])
     if path_prod_table and path_prod_table[uri] ~= nil then 
+
+
+
       if conf.open_debug == 1 then
         ngx.log(ngx.NOTICE, " mapping charge path "..uri," to "..path_prod_table[uri])
       end
