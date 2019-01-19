@@ -109,7 +109,7 @@ function ChargeMsgHandler:log(conf, other)
     if not path_prod_table  then
       kong.log.notice("creating a new path_prod_table for cache key: ", cache_key)
 
-      path_prod_table,err = paths.new(conf)
+      path_prod_table = paths.new(conf)
 
       if not path_prod_table then
         ngx.log(ngx.ERR, "[charge-log] failed to create a path_prod_table for a given configuration: ", err)
@@ -118,12 +118,10 @@ function ChargeMsgHandler:log(conf, other)
       end
     end
 
-    if path_prod_table then
-      for k,v in ipairs(path_prod_table) do
-        ngx.log(ngx.NOTICE, "key is "..k," value is "..v)
-      end
-
+    for k,v in ipairs(path_prod_table) do
+      ngx.log(ngx.NOTICE, "key is "..k," value is "..v)
     end
+
     ngx.log(ngx.NOTICE, " old uri is ", uri)
     ngx.log(ngx.NOTICE, " test uri1 is ", path_prod_table["/a/284736964_120052353"])
     ngx.log(ngx.NOTICE, " test uri2 is ", path_prod_table["\\/a\\/284736964_120052353"])
