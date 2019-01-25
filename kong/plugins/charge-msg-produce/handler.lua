@@ -82,8 +82,10 @@ function ChargeMsgHandler:log(conf, other)
 
   -- no charge 1
   local fee = request.get_headers()["X-Custom-Fee"]
-  if not fee or fee == false then
-  	return
+  if not fee or fee ~= "true" then
+    return
+  else
+    ngx.log(ngx.NOTICE," will charge ", "true")
   end
 
   -- no charge 2
@@ -101,9 +103,9 @@ function ChargeMsgHandler:log(conf, other)
   
   -- get path_prod table from cache
 
-  local path_prod_table = path_prod_cache[cache_key]
+
   if conf.path_prodcode_mappings ~= nil then
-    
+    local path_prod_table = path_prod_cache[cache_key]
     if not path_prod_table  then
       kong.log.notice("creating a new path_prod_table for cache key: ", cache_key)
 
