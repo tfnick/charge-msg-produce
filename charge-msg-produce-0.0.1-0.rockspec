@@ -15,6 +15,7 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
+      ["kong.plugins.charge-msg-produce.feechecker"] = "kong/plugins/charge-msg-produce/feechecker.lua",
       ["kong.plugins.charge-msg-produce.paths"] = "kong/plugins/charge-msg-produce/paths.lua",
       ["kong.plugins.charge-msg-produce.handler"] = "kong/plugins/charge-msg-produce/handler.lua",
       ["kong.plugins.charge-msg-produce.schema"] = "kong/plugins/charge-msg-produce/schema.lua",
