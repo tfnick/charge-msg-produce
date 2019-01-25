@@ -140,7 +140,7 @@ function ChargeMsgHandler:log(conf, other)
   end
 
   -- kafka producer support send async message why use ngx.timer.at function here? 
-  local ok, err = ngx.timer.at(0, log, conf, message)
+  local ok, err = ngx.timer.at(0, log, conf, msg)
   if not ok then
     ngx.log(ngx.ERR, "[charge-log] failed to create timer: ", err)
   end
