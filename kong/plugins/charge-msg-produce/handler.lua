@@ -69,7 +69,6 @@ end
 
 function ChargeMsgHandler:log(conf, other)
   ChargeMsgHandler.super.log(self)
-  ngx.log(ngx.NOTICE, " entry ", " charge plugins ")
   local request = ngx.req
 
   local msg = {}
@@ -84,7 +83,7 @@ function ChargeMsgHandler:log(conf, other)
   -- no charge 1
   local fee = fee_checker.isFee("X-Custom-Fee",ngx.header)
   if fee then
-    ngx.log(ngx.NOTICE," will charge ", "true")
+    -- nothing
   else
     return
   end
@@ -133,9 +132,8 @@ function ChargeMsgHandler:log(conf, other)
   msg["reqt"] = ngx.req.start_time() * 1000
   msg["rest"] = msg["reqt"] + ngx.var.request_time * 1000
 
-  local message = cjson_encode(msg)
-
   if conf.open_debug == 1 then
+    local message = cjson_encode(msg)
     ngx.log(ngx.NOTICE," charge message body ", message)
   end
 
