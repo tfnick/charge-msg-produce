@@ -5,6 +5,7 @@ local cjson = require "cjson"
 local cjson_encode = cjson.encode
 local utils = require "kong.tools.utils"
 local paths = require "kong.plugins.charge-msg-produce.paths"
+local fee_cheker = require "kong.plugins.charge-msg-produce.feecheker"
 local ipairs = ipairs
 local ChargeMsgHandler = BasePlugin:extend()
 
@@ -81,11 +82,11 @@ function ChargeMsgHandler:log(conf, other)
   end
 
   -- no charge 1
-  local fee = response.get_headers()["X-Custom-Fee"]
-  if not fee or fee ~= "true" then
-    return
-  else
+  local fee = fee_cheker.isFee("X-Custom-Fee",ngx.header)
+  if fee then
     ngx.log(ngx.NOTICE," will charge ", "true")
+  else
+    return
   end
 
   -- no charge 2
