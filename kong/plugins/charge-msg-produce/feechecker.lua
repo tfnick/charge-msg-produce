@@ -10,4 +10,14 @@ function _M.isFee(feeHeader, ngx_headers)
   return fee
 end
 
+--- project name in rulev2 which using for project fee
+function _M.achieveProject(projectHeader, ngx_headers)
+  -- remove headers
+  local name = nil
+  if ngx_headers[projectHeader] ~= nil and ngx_headers[projectHeader] ~= "" then
+    name =  ngx_headers[projectHeader]
+  end
+  return name
+end
+
 return _M

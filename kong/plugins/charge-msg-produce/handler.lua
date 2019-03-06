@@ -100,10 +100,14 @@ function ChargeMsgHandler:log(conf, other)
     end
   end
 
+  local project = fee_checker.achieveProject("X-Custom-Project",ngx.header)
+
+  -- assemble uri/projectName as the final fee path
+  if not project then
+    uri = uri.."/"..project
+  end
   
   -- get path_prod table from cache
-
-
   if conf.path_prodcode_mappings ~= nil then
     local path_prod_table = path_prod_cache[cache_key]
     if not path_prod_table  then
