@@ -103,7 +103,7 @@ function ChargeMsgHandler:log(conf, other)
   local project = fee_checker.achieveProject("X-Custom-Project",ngx.header)
 
   -- assemble uri/projectName as the final fee path
-  if not project then
+  if project ~= nil then
     uri = uri.."/"..project
   end
   
