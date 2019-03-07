@@ -43,7 +43,7 @@ local function log(premature, conf, message)
 
   local producer = producers_cache[cache_key]
   if not producer then
-    kong.log.notice("creating a new Kafka Producer for cache key: ", cache_key)
+    ngx.log(ngx.NOTICE,"creating a new Kafka Producer for cache key: ", cache_key)
 
     local err
     producer, err = producers.new(conf)
@@ -56,7 +56,8 @@ local function log(premature, conf, message)
   end
 
   -- send message 
-  local ok, err = producer:send(conf.topic, nil, cjson_encode(message))
+  local final_msg, n, err = ngx.re.gsub(cjson_encode(message), [[\\/]], [[/]])
+  local ok, err = producer:send(conf.topic, nil, final_msg)
   if not ok then
     ngx.log(ngx.ERR, "[charge-log] failed to send a message on topic ", conf.topic, ": ", err)
     return
@@ -137,7 +138,7 @@ function ChargeMsgHandler:log(conf, other)
   msg["rest"] = msg["reqt"] + ngx.var.request_time * 1000
 
   if conf.open_debug == 1 then
-    local message = cjson_encode(msg)
+    local message, n, err = ngx.re.gsub(cjson_encode(msg), [[\\/]], [[/]])
     ngx.log(ngx.NOTICE," charge message body ", message)
   end
 
