@@ -72,12 +72,15 @@ function ChargeMsgHandler:log(conf, other)
   ChargeMsgHandler.super.log(self)
   local request = ngx.req
 
+  -- no charge 2
+  local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
+
   local msg = {}
   -- error access
   msg["cid"] = request.get_headers()["X-Consumer-Custom-ID"]
 
   if msg["cid"] == nil then
-  	ngx.log(ngx.ERR, " invalid charge message ", " can not retrieve cid ")
+  	ngx.log(ngx.ERR, " invalid charge message ", " can not retrieve cid "..uri)
   	return
   end
 
@@ -89,8 +92,7 @@ function ChargeMsgHandler:log(conf, other)
     return
   end
 
-  -- no charge 2
-  local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
+
 
   if conf.black_paths then
     for _, rule in ipairs(conf.black_paths) do
