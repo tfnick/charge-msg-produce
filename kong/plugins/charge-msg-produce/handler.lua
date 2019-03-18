@@ -74,6 +74,10 @@ function ChargeMsgHandler:log(conf, other)
 
   -- no charge 2
   local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
+  local uri2 = ngx.var.request_uri or ""
+
+  ngx.log(ngx.NOTICE, "path1", uri)
+  ngx.log(ngx.NOTICE, "path2", uri2)
 
   local msg = {}
   -- error access
