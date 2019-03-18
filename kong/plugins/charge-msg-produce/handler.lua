@@ -70,23 +70,6 @@ end
 
 function ChargeMsgHandler:log(conf, other)
   ChargeMsgHandler.super.log(self)
-  local request = ngx.req
-
-  -- no charge 2
-  local uri = ngx.ctx.service.path -- ngx.var.request_uri or ""
-  local uri2 = ngx.var.request_uri or ""
-
-  ngx.log(ngx.NOTICE, "path1", uri)
-  ngx.log(ngx.NOTICE, "path2", uri2)
-
-  local msg = {}
-  -- error access
-  msg["cid"] = request.get_headers()["X-Consumer-Custom-ID"]
-
-  if msg["cid"] == nil then
-  	ngx.log(ngx.ERR, " invalid charge message ", " can not retrieve cid "..uri)
-  	return
-  end
 
   -- no charge 1
   local fee = fee_checker.isFee("X-Custom-Fee",ngx.header)
@@ -96,6 +79,26 @@ function ChargeMsgHandler:log(conf, other)
     return
   end
 
+  local request = ngx.req
+
+  -- no charge 2
+  local service = ngx.ctx.service
+  local uri = nil
+  if service ~= nil then
+    uri = service.path
+  else
+    ngx.log(ngx.ERR, " stop send charge message cause of ngx.ctx.service is nil, request_uri is ", ngx.var.request_uri)
+    return
+  end
+
+  local msg = {}
+  -- error access
+  msg["cid"] = request.get_headers()["X-Consumer-Custom-ID"]
+
+  if msg["cid"] == nil then
+    ngx.log(ngx.ERR, " stop send charge message ", " can not retrieve cid "..uri)
+    return
+  end
 
 
   if conf.black_paths then
