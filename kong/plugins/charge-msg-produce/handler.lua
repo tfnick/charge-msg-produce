@@ -85,20 +85,16 @@ function ChargeMsgHandler:log(conf, other)
 
 
   -- no charge 2
-  local service = ngx.ctx.service
-  local uri = nil
-  if service ~= nil then
-    uri = service.path
-  else
+  local uri = kong.request.get_path()
+  if uri == nil then
     ngx.log(ngx.ERR, " stop send charge message cause of ngx.ctx.service is nil, request_uri is ", ngx.var.request_uri)
     return
   end
 
-  if conf.open_debug == 1 then
-    ngx.log(ngx.NOTICE, "kong.request.get_path()", kong.request.get_path())
-
-    ngx.log(ngx.NOTICE, "ngx.ctx.service.path", service.path)
-  end
+  --if conf.open_debug == 1 then
+  --  ngx.log(ngx.NOTICE, "kong.request.get_path()", kong.request.get_path())
+  --  ngx.log(ngx.NOTICE, "ngx.ctx.service.path", service.path)
+  --end
 
   local msg = {}
   -- error access
