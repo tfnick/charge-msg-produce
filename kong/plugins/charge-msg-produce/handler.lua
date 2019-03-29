@@ -96,7 +96,7 @@ function ChargeMsgHandler:log(conf, other)
 
   if conf.open_debug == 1 then
     ngx.log(ngx.NOTICE, "kong.request.get_path()", kong.request.get_path())
-    ngx.log(ngx.NOTICE, "kong.router.get_route()", kong.router.get_route())
+
     ngx.log(ngx.NOTICE, "ngx.ctx.service.path", service.path)
   end
 
